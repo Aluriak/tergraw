@@ -10,3 +10,5 @@ Here is the API:
 Installation:
 
     pip install tergraw
+
+links: tergraw on [github](http://github.com/aluriak/tergraw) and [pypi](http://pypi.python.org/pypi/tergraw)
