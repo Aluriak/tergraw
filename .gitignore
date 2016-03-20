@@ -1,0 +1,8 @@
+venv/
+*.pyc
+__pycache__/
+*.vim
+dist/
+fief.egg-info/
+.cache/
+tergraw.egg-info
