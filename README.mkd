@@ -10,5 +10,7 @@ Here is the API:
 Installation:
 
     pip install tergraw
+    
+Needs the [graphviz library](http://graphviz.org/Download..php) to be installed.
 
 links: tergraw on [github](http://github.com/aluriak/tergraw) and [pypi](http://pypi.python.org/pypi/tergraw)
