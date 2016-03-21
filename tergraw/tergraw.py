@@ -30,7 +30,8 @@ def create_layout(graph, graphviz_prog=DEFAULT_GRAPHVIZ_PROG):
 
 
 @graphutils.process_input_graph
-def pretty_view(graph, oriented=False, graphviz_prog=DEFAULT_GRAPHVIZ_PROG):
+def pretty_view(graph, oriented=False, construction=False,
+                graphviz_prog=DEFAULT_GRAPHVIZ_PROG):
     """Yield strings, printable view of given graph"""
     layout = create_layout(graph, graphviz_prog=graphviz_prog)
     matrix_view = defaultdict(lambda: ' ')
@@ -66,6 +67,9 @@ def pretty_view(graph, oriented=False, graphviz_prog=DEFAULT_GRAPHVIZ_PROG):
                         if not isinstance(char, str):
                             char = char.value
                         matrix_view[previous_source] = char
+                        if construction:
+                            old = defaultdict(lambda: ' ', matrix_view)
+                            yield _build_view(matrix_view)
                         assert isinstance(matrix_view[previous_source], str)
                     if source != target:
                         previous_edge_char = edge_char
@@ -74,6 +78,8 @@ def pretty_view(graph, oriented=False, graphviz_prog=DEFAULT_GRAPHVIZ_PROG):
 
         if oriented:
             matrix_view[previous_position] = ORIENTATION[previous_edge_char, edge_char]
+        if construction:
+            yield _build_view(matrix_view)
 
     # Add the node to the view
     for node, (x, y) in layout.items():
@@ -86,7 +92,13 @@ def pretty_view(graph, oriented=False, graphviz_prog=DEFAULT_GRAPHVIZ_PROG):
             else:  # not printable
                 break
 
-    return _build_view(matrix_view)
+
+    if construction:
+        yield _build_view(matrix_view)
+    else:
+        yield from _build_view(matrix_view)
+    if construction:
+        yield _build_view(matrix_view)
 
 
 def _build_view(matrix):
