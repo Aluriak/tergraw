@@ -17,7 +17,7 @@ CORNER_UPRIGHT, CORNER_UPLEFT     = '└', '┘'
 CORNER_DOWNRIGHT, CORNER_DOWNLEFT = '┌', '┐'
 BAR_UPDOWN, BAR_LEFT_RIGHT = '│', '─'
 REWRITABLE_LETTERS = (CORNER_UPRIGHT, CORNER_UPLEFT, CORNER_DOWNLEFT,
-                      CORNER_DOWNRIGHT, BAR_UPDOWN, BAR_LEFT_RIGHT)
+                      CORNER_DOWNRIGHT, BAR_UPDOWN, BAR_LEFT_RIGHT, ' ')
 
 # {current direction, next direction: character to be printed}
 CHARACTER = {  # {current direction, next direction: character to be printed}
