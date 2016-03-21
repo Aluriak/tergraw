@@ -4,7 +4,8 @@ Implementation of graph printing routines.
 """
 from collections import defaultdict
 
-from .constant import Direction, DEFAULT_GRAPHVIZ_PROG, CHARACTER, ORIENTATION
+from .constant import (Direction, DEFAULT_GRAPHVIZ_PROG, CHARACTER,
+                       ORIENTATION, REWRITABLE_LETTERS)
 from . import graphutils
 
 
