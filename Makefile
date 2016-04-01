@@ -4,7 +4,7 @@ run:
 	python3 -m $(PACKAGE)
 
 t:
-	py.test $(PACKAGE) --doctest-module --failed-first --exitfirst
+	py.test $(PACKAGE) --doctest-module --failed-first
 
 register:
 	python3 setup.py sdist register
