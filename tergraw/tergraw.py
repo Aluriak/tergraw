@@ -81,7 +81,7 @@ def pretty_view(graph, oriented=False, construction=False,
                         matrix_view[previous_source] = char
                         if construction:
                             old = defaultdict(lambda: ' ', matrix_view)
-                            yield _build_view(matrix_view)
+                            yield view.build(matrix_view)
                         assert isinstance(matrix_view[previous_source], str)
                     if source != target:
                         previous_edge_char = edge_char
@@ -91,45 +91,101 @@ def pretty_view(graph, oriented=False, construction=False,
         if oriented:
             matrix_view[previous_position] = ORIENTATION[previous_edge_char, edge_char]
         if construction:
-            yield _build_view(matrix_view)
+            yield view.build(matrix_view)
 
-    # Add the node to the view
+    # mark the place where nodes labels will be added
+    # for node, coords in layout.items():
+        # matrix_view[coords] = node[0]
+    # Add the node labels to the view
+    # matrix_view = view.clean(matrix_view)
     for node, (x, y) in layout.items():
-        for offset, letter in enumerate(node):
-            coords = offset + x, y
-            if coords not in matrix_view:
-                matrix_view[coords] = letter
-            elif matrix_view[coords] in REWRITABLE_LETTERS:
-                matrix_view[coords] = letter
-            else:  # not printable
-                break
+        # if len(node) == 1: continue
+        row_min, row_max = (view.previous_unwrittable_on_row(matrix_view, (x, y)),
+                            view.next_unwrittable_on_row(matrix_view, (x, y)))
+        col_min, col_max = (view.previous_unwrittable_on_col(matrix_view, (x, y)),
+                              view.next_unwrittable_on_col(matrix_view, (x, y)))
+        print('NODE ' + node + ':',
+              '→row: [{};{}]'.format(row_min, row_max).ljust(20),
+              '↓col: [{};{}]'.format(col_min, col_max))
+        print_coords = [itertools.count(x), itertools.cycle((y,))]
+        if row_min is None:  # write left to right, end at (x, y)
+            if row_max is None or row_max > (x + len(node) / 2):  # enough space at the right
+                factor = 2
+            else:
+                factor = 1
+            print_coords[0] = tuple(
+                x - (len(node) // factor) + offset + 1
+                for offset in range(len(node))
+            )
+            print('DEBUG 1:', y, len(node), print_coords[0])
+        elif row_max is None:  # write left to right, beginning at (x, y)
+            if row_min < (x - len(node) / 2):  # enough space at the left
+                factor = 1
+            else:
+                factor = 0
+            print_coords[0] = tuple(
+                x + offset - (len(node) // 2) * factor
+                for offset in range(len(node))
+            )
+            print('DEBUG 2:', print_coords[0])
+        elif (row_max - row_min) > len(node) + 1:  # write left to right, if enough place
+            print_coords[0] = tuple(
+                x + offset
+                for offset in range(len(node))
+            )
+            print('DEBUG 3:', print_coords[0])
+
+        elif col_min is None:  # write up to down, end at (x, y)
+            if col_max is None or col_max > (x + len(node) / 2):  # enough space at the right
+                factor = 2
+            else:
+                factor = 1
+            print_coords = (itertools.cycle((x,)), tuple(
+                y - (len(node) // factor) + offset + 1
+                for offset in range(len(node))
+            ))
+            print('DEBUG 4:', y, len(node), print_coords[1])
+        elif col_max is None:  # write up to down, beginning at (x, y)
+            if col_min < (x - len(node) / 2):  # enough space at the left
+                factor = 1
+            else:
+                factor = 0
+            print_coords = (itertools.cycle((x,)), tuple(
+                y + offset - (len(node) // 2) * factor
+                for offset in range(len(node))
+            ))
+            print('DEBUG 5:', print_coords[1])
+        elif (col_max - col_min) > len(node) + 1:  # write up to down, if enough place
+            print_coords = (itertools.cycle((x,)), tuple(
+                y + offset
+                for offset in range(len(node))
+            ))
+            print('DEBUG 6:', print_coords[1])
+        else:  # not enough space
+            if (row_max - row_min) > (col_max - col_min):
+                # more space on Y axis
+                node = node[:row_max - row_min]  # cut the node
+                print_coords = (itertools.cycle((x,)), tuple(
+                    x + offset
+                    for offset in range(len(node))
+                ))
+                print('DEBUG 7:', print_coords[1])
+            else:
+                # more space on X axis
+                node = node[:col_max - col_min]  # cut the node
+                print_coords[0] = tuple(
+                    x + offset
+                    for offset in range(len(node))
+                )
+                print('DEBUG 8:', print_coords[0])
+
+        for letter, i, j in zip(node, *print_coords):
+            matrix_view[i, j] = letter
+
+
 
 
     if construction:
-        yield _build_view(matrix_view)
+        yield view.build(matrix_view)
     else:
-        yield from _build_view(matrix_view)
-    if construction:
-        yield _build_view(matrix_view)
-
-
-def _build_view(matrix):
-    """Yield lines generated from given matrix"""
-    max_x = max(matrix, key=lambda t: t[0])[0]
-    min_x = min(matrix, key=lambda t: t[0])[0]
-    max_y = max(matrix, key=lambda t: t[1])[1]
-    min_y = min(matrix, key=lambda t: t[1])[1]
-    yield from (
-        ''.join(matrix[i, j] for i in range(min_x, max_x+1))
-        for j in range(min_y, max_y+1)
-    )
-
-
-def _is_up(source, target):
-    return source[1] - target[1] > 0
-def _is_right(source, target):
-    return source[0] - target[0] < 0
-def _is_down(source, target):
-    return source[1] - target[1] < 0
-def _is_left(source, target):
-    return source[0] - target[0] > 0
+        yield from view.build(matrix_view)
