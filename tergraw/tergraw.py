@@ -106,9 +106,9 @@ def pretty_view(graph, oriented=False, construction=False,
                             view.next_unwrittable_on_row(matrix_view, (x, y)))
         col_min, col_max = (view.previous_unwrittable_on_col(matrix_view, (x, y)),
                               view.next_unwrittable_on_col(matrix_view, (x, y)))
-        print('NODE ' + node + ':',
-              '→row: [{};{}]'.format(row_min, row_max).ljust(20),
-              '↓col: [{};{}]'.format(col_min, col_max))
+        # print('NODE ' + node + ':',
+              # '→row: [{};{}]'.format(row_min, row_max).ljust(20),
+              # '↓col: [{};{}]'.format(col_min, col_max))
         print_coords = [itertools.count(x), itertools.cycle((y,))]
         if row_min is None:  # write left to right, end at (x, y)
             if row_max is None or row_max > (x + len(node) / 2):  # enough space at the right
@@ -119,7 +119,7 @@ def pretty_view(graph, oriented=False, construction=False,
                 x - (len(node) // factor) + offset + 1
                 for offset in range(len(node))
             )
-            print('DEBUG 1:', y, len(node), print_coords[0])
+            # print('DEBUG 1:', y, len(node), print_coords[0])
         elif row_max is None:  # write left to right, beginning at (x, y)
             if row_min < (x - len(node) / 2):  # enough space at the left
                 factor = 1
@@ -129,13 +129,13 @@ def pretty_view(graph, oriented=False, construction=False,
                 x + offset - (len(node) // 2) * factor
                 for offset in range(len(node))
             )
-            print('DEBUG 2:', print_coords[0])
+            # print('DEBUG 2:', print_coords[0])
         elif (row_max - row_min) > len(node) + 1:  # write left to right, if enough place
             print_coords[0] = tuple(
                 x + offset
                 for offset in range(len(node))
             )
-            print('DEBUG 3:', print_coords[0])
+            # print('DEBUG 3:', print_coords[0])
 
         elif col_min is None:  # write up to down, end at (x, y)
             if col_max is None or col_max > (x + len(node) / 2):  # enough space at the right
@@ -146,7 +146,7 @@ def pretty_view(graph, oriented=False, construction=False,
                 y - (len(node) // factor) + offset + 1
                 for offset in range(len(node))
             ))
-            print('DEBUG 4:', y, len(node), print_coords[1])
+            # print('DEBUG 4:', y, len(node), print_coords[1])
         elif col_max is None:  # write up to down, beginning at (x, y)
             if col_min < (x - len(node) / 2):  # enough space at the left
                 factor = 1
@@ -156,13 +156,13 @@ def pretty_view(graph, oriented=False, construction=False,
                 y + offset - (len(node) // 2) * factor
                 for offset in range(len(node))
             ))
-            print('DEBUG 5:', print_coords[1])
+            # print('DEBUG 5:', print_coords[1])
         elif (col_max - col_min) > len(node) + 1:  # write up to down, if enough place
             print_coords = (itertools.cycle((x,)), tuple(
                 y + offset
                 for offset in range(len(node))
             ))
-            print('DEBUG 6:', print_coords[1])
+            # print('DEBUG 6:', print_coords[1])
         else:  # not enough space
             if (row_max - row_min) > (col_max - col_min):
                 # more space on Y axis
@@ -171,7 +171,7 @@ def pretty_view(graph, oriented=False, construction=False,
                     x + offset
                     for offset in range(len(node))
                 ))
-                print('DEBUG 7:', print_coords[1])
+                # print('DEBUG 7:', print_coords[1])
             else:
                 # more space on X axis
                 node = node[:col_max - col_min]  # cut the node
@@ -179,7 +179,7 @@ def pretty_view(graph, oriented=False, construction=False,
                     x + offset
                     for offset in range(len(node))
                 )
-                print('DEBUG 8:', print_coords[0])
+                # print('DEBUG 8:', print_coords[0])
 
         for letter, i, j in zip(node, *print_coords):
             matrix_view[i, j] = letter

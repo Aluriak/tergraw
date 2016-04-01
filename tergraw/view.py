@@ -23,7 +23,8 @@ def build(matrix):
     max_y = max(matrix, key=lambda t: t[1])[1]
     min_y = min(matrix, key=lambda t: t[1])[1]
     yield from (
-        '{}:'.format(j).ljust(4) + ''.join(matrix[i, j] for i in range(min_x, max_x+1))
+        # '{}:'.format(j).ljust(4) + ''.join(matrix[i, j] for i in range(min_x, max_x+1))
+        ''.join(matrix[i, j] for i in range(min_x, max_x+1))
         for j in range(min_y, max_y+1)
     )
 
