@@ -99,7 +99,9 @@ def pretty_view(graph, oriented=False, construction=False,
     # Add the node labels to the view
     # matrix_view = view.clean(matrix_view)
     for node, (x, y) in layout.items():
-        # if len(node) == 1: continue
+        if len(node) == 1:
+            matrix_view[x, y] = node
+            continue
         row_min, row_max = (view.previous_unwrittable_on_row(matrix_view, (x, y)),
                             view.next_unwrittable_on_row(matrix_view, (x, y)))
         col_min, col_max = (view.previous_unwrittable_on_col(matrix_view, (x, y)),
