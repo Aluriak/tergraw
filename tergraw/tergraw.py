@@ -2,11 +2,31 @@
 Implementation of graph printing routines.
 
 """
+import itertools
 from collections import defaultdict
 
 from .constant import (Direction, DEFAULT_GRAPHVIZ_PROG, CHARACTER,
                        ORIENTATION, REWRITABLE_LETTERS)
 from . import graphutils
+from . import view
+
+
+def _is_up(source, target):
+    return source[1] - target[1] > 0
+def _is_right(source, target):
+    return source[0] - target[0] < 0
+def _is_down(source, target):
+    return source[1] - target[1] < 0
+def _is_left(source, target):
+    return source[0] - target[0] > 0
+
+# iter of (predicate, source position transform, edge character):
+DIRECTIONS = (
+    (_is_up,    (lambda s: (s[0], s[1] - 1)), Direction.Up),
+    (_is_right, (lambda s: (s[0] + 1, s[1])), Direction.Right),
+    (_is_down,  (lambda s: (s[0], s[1] + 1)), Direction.Down),
+    (_is_left,  (lambda s: (s[0] - 1, s[1])), Direction.Left),
+)
 
 
 @graphutils.process_input_graph
@@ -38,14 +58,6 @@ def pretty_view(graph, oriented=False, construction=False,
 
     # Add the edge to the view
 
-    # iter of (predicate, source position transform, edge character):
-    directions = (
-        (_is_up,    (lambda s: (s[0], s[1] - 1)), Direction.Up),
-        (_is_right, (lambda s: (s[0] + 1, s[1])), Direction.Right),
-        (_is_down,  (lambda s: (s[0], s[1] + 1)), Direction.Down),
-        (_is_left,  (lambda s: (s[0] - 1, s[1])), Direction.Left),
-    )
-
     # print('GRAPH EDGES:', tuple(graph.edges()))
     # print('LAYOUT:', layout)
 
@@ -57,7 +69,7 @@ def pretty_view(graph, oriented=False, construction=False,
         previous_edge_char = None
         previous_position = source
         while source != target:
-            for is_dir, transform, edge_char in directions:
+            for is_dir, transform, edge_char in DIRECTIONS:
                 first_loop = previous_edge_char is None
                 if is_dir(source, target):
                     previous_source = source
